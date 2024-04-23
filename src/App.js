@@ -5,6 +5,7 @@ import Products from "./components/Shop/Products";
 import { useDispatch, useSelector } from "react-redux";
 import { uiActions } from "./store/ui-slice";
 import Notification from "./components/UI/Notification";
+import { sendData, fetchCartData } from "./store/cart-actions";
 
 let isInitial = true;
 
@@ -16,47 +17,65 @@ function App() {
 
   //put request will override the existing data
   /////////////////////////////////////////////////////example 1 using useeffect for send http request
+  // useEffect(() => {
+  //   dispatch(
+  //     uiActions.setNotification({
+  //       status: "pending",
+  //       title: "Sending",
+  //       message: "Sending cart Data",
+  //     })
+  //   );
+
+  //   const sendCartData = async () => {
+  //     //cart.json create a new cart node in database
+  //     const response = await fetch("sdfsdf/cart.json", {
+  //       method: "PUT",
+  //       body: JSON.stringify(cart), //convert cart to json data
+  //     });
+  //     if (!response.ok) {
+  //       throw new Error("sending cart data failed");
+  //     }
+  //     dispatch(
+  //       uiActions.setNotification({
+  //         status: "success",
+  //         title: "Success",
+  //         message: "Send cart data successfully",
+  //       })
+  //     );
+  //   };
+
+  //   if (isInitial) {
+  //     isInitial = false;
+  //     return;
+  //   }
+
+  //   sendCartData().catch((error) => {
+  //     dispatch(
+  //       uiActions.setNotification({
+  //         status: "error",
+  //         title: "error",
+  //         message: "Send cart data failes",
+  //       })
+  //     );
+  //   });
+  // }, [cart, dispatch]);
+
+  //////////////////////////////////////////////////////////using action creators that called thunk
+
+  //we wanna fetchdata it this appliction runs
   useEffect(() => {
-    dispatch(
-      uiActions.setNotification({
-        status: "pending",
-        title: "Sending",
-        message: "Sending cart Data",
-      })
-    );
+    dispatch(fetchCartData);
+  }, [dispatch]);
 
-    const sendCartData = async () => {
-      //cart.json create a new cart node in database
-      const response = await fetch("sdfsdf/cart.json", {
-        method: "PUT",
-        body: JSON.stringify(cart), //convert cart to json data
-      });
-      if (!response.ok) {
-        throw new Error("sending cart data failed");
-      }
-      dispatch(
-        uiActions.setNotification({
-          status: "success",
-          title: "Success",
-          message: "Send cart data successfully",
-        })
-      );
-    };
-
+  //this exeute whenever cart data change
+  useEffect(() => {
     if (isInitial) {
       isInitial = false;
       return;
     }
-
-    sendCartData().catch((error) => {
-      dispatch(
-        uiActions.setNotification({
-          status: "error",
-          title: "error",
-          message: "Send cart data failes",
-        })
-      );
-    });
+    if (cart.changed === true) {
+      dispatch(sendData(cart));
+    }
   }, [cart, dispatch]);
 
   return (
